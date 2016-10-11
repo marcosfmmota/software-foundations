@@ -1,0 +1,80 @@
+Symbols.vo Symbols.glob Symbols.v.beautified: Symbols.v
+Symbols.vio: Symbols.v
+Preface.vo Preface.glob Preface.v.beautified: Preface.v
+Preface.vio: Preface.v
+Basics.vo Basics.glob Basics.v.beautified: Basics.v
+Basics.vio: Basics.v
+Induction.vo Induction.glob Induction.v.beautified: Induction.v
+Induction.vio: Induction.v
+Lists.vo Lists.glob Lists.v.beautified: Lists.v
+Lists.vio: Lists.v
+Poly.vo Poly.glob Poly.v.beautified: Poly.v
+Poly.vio: Poly.v
+Tactics.vo Tactics.glob Tactics.v.beautified: Tactics.v
+Tactics.vio: Tactics.v
+Logic.vo Logic.glob Logic.v.beautified: Logic.v
+Logic.vio: Logic.v
+IndProp.vo IndProp.glob IndProp.v.beautified: IndProp.v
+IndProp.vio: IndProp.v
+Maps.vo Maps.glob Maps.v.beautified: Maps.v
+Maps.vio: Maps.v
+ProofObjects.vo ProofObjects.glob ProofObjects.v.beautified: ProofObjects.v
+ProofObjects.vio: ProofObjects.v
+IndPrinciples.vo IndPrinciples.glob IndPrinciples.v.beautified: IndPrinciples.v
+IndPrinciples.vio: IndPrinciples.v
+SfLib.vo SfLib.glob SfLib.v.beautified: SfLib.v
+SfLib.vio: SfLib.v
+Rel.vo Rel.glob Rel.v.beautified: Rel.v
+Rel.vio: Rel.v
+Imp.vo Imp.glob Imp.v.beautified: Imp.v
+Imp.vio: Imp.v
+ImpParser.vo ImpParser.glob ImpParser.v.beautified: ImpParser.v
+ImpParser.vio: ImpParser.v
+ImpCEvalFun.vo ImpCEvalFun.glob ImpCEvalFun.v.beautified: ImpCEvalFun.v
+ImpCEvalFun.vio: ImpCEvalFun.v
+Extraction.vo Extraction.glob Extraction.v.beautified: Extraction.v
+Extraction.vio: Extraction.v
+Equiv.vo Equiv.glob Equiv.v.beautified: Equiv.v
+Equiv.vio: Equiv.v
+Hoare.vo Hoare.glob Hoare.v.beautified: Hoare.v
+Hoare.vio: Hoare.v
+Hoare2.vo Hoare2.glob Hoare2.v.beautified: Hoare2.v
+Hoare2.vio: Hoare2.v
+HoareAsLogic.vo HoareAsLogic.glob HoareAsLogic.v.beautified: HoareAsLogic.v
+HoareAsLogic.vio: HoareAsLogic.v
+Smallstep.vo Smallstep.glob Smallstep.v.beautified: Smallstep.v
+Smallstep.vio: Smallstep.v
+Auto.vo Auto.glob Auto.v.beautified: Auto.v
+Auto.vio: Auto.v
+Types.vo Types.glob Types.v.beautified: Types.v
+Types.vio: Types.v
+Stlc.vo Stlc.glob Stlc.v.beautified: Stlc.v
+Stlc.vio: Stlc.v
+StlcProp.vo StlcProp.glob StlcProp.v.beautified: StlcProp.v
+StlcProp.vio: StlcProp.v
+MoreStlc.vo MoreStlc.glob MoreStlc.v.beautified: MoreStlc.v
+MoreStlc.vio: MoreStlc.v
+Sub.vo Sub.glob Sub.v.beautified: Sub.v
+Sub.vio: Sub.v
+Typechecking.vo Typechecking.glob Typechecking.v.beautified: Typechecking.v
+Typechecking.vio: Typechecking.v
+Records.vo Records.glob Records.v.beautified: Records.v
+Records.vio: Records.v
+References.vo References.glob References.v.beautified: References.v
+References.vio: References.v
+RecordSub.vo RecordSub.glob RecordSub.v.beautified: RecordSub.v
+RecordSub.vio: RecordSub.v
+Norm.vo Norm.glob Norm.v.beautified: Norm.v
+Norm.vio: Norm.v
+LibTactics.vo LibTactics.glob LibTactics.v.beautified: LibTactics.v
+LibTactics.vio: LibTactics.v
+UseTactics.vo UseTactics.glob UseTactics.v.beautified: UseTactics.v
+UseTactics.vio: UseTactics.v
+UseAuto.vo UseAuto.glob UseAuto.v.beautified: UseAuto.v
+UseAuto.vio: UseAuto.v
+PE.vo PE.glob PE.v.beautified: PE.v
+PE.vio: PE.v
+Postscript.vo Postscript.glob Postscript.v.beautified: Postscript.v
+Postscript.vio: Postscript.v
+Bib.vo Bib.glob Bib.v.beautified: Bib.v
+Bib.vio: Bib.v
