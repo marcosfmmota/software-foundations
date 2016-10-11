@@ -602,11 +602,12 @@ Qed.
 Theorem Sn_le_Sm__n_le_m : forall n m,
   S n <= S m -> n <= m.
 Proof.
-  intros. inversion H.
-  - apply le_n.
-  - inversion H1.
+  intros. remember (S n). remember (S m). induction H.
+  - rewrite Heqn0 in Heqn1. inversion Heqn1. apply le_n.
+  - rewrite Heqn0 in H. inversion Heqn1. 
     + apply le_S. apply le_n.
-    +  
+    + admit. 
+Qed.
 
 Theorem le_plus_l : forall a b,
   a <= a + b.
@@ -968,13 +969,27 @@ Qed.
 Lemma empty_is_empty : forall T (s : list T),
   ~ (s =~ EmptySet).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold not. intros. inversion H.
+Qed.
 
 Lemma MUnion' : forall T (s : list T) (re1 re2 : reg_exp T),
   s =~ re1 \/ s =~ re2 ->
   s =~ Union re1 re2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. destruct H.
+  - apply MUnionL. apply H.
+  - apply MUnionR. apply H.
+Qed.
+
+Theorem list_equal_reg_exp_list: forall T (s: list T),
+  s =~ reg_exp_of_list s.
+Proof.
+  intros. induction s.
+  - simpl. apply MEmpty.
+  - simpl. apply (MApp [x] (Char x) s).
+    + apply MChar.
+    + apply IHs.
+Qed.  
 
 (** The next lemma is stated in terms of the [fold] function from the
     [Poly] chapter: If [ss : list (list T)] represents a sequence of
