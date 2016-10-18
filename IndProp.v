@@ -552,6 +552,9 @@ Inductive next_even : nat -> nat -> Prop :=
 (** Define an inductive binary relation [total_relation] that holds
     between every pair of natural numbers. *)
 
+Inductive total_relation : nat->nat->Prop :=
+  | total : forall (n:nat) (m:nat),  total_relation n m.
+
 (*Inductive ge : nat -> nat -> Prop :=
   | ge_n : forall n, ge n n
   | ge_S : forall n m, (ge n m) -> (ge (S n) m). 
@@ -564,7 +567,7 @@ Inductive next_even : nat -> nat -> Prop :=
 (** Define an inductive binary relation [empty_relation] (on numbers)
     that never holds. *)
 
-Inductive nat_not: nat -> nat -> Prop :=
+Inductive empty_relation: nat -> nat -> Prop :=
   .  
 
 
@@ -605,8 +608,7 @@ Proof.
   intros. remember (S n). remember (S m). induction H.
   - rewrite Heqn0 in Heqn1. inversion Heqn1. apply le_n.
   - rewrite Heqn0 in H. inversion Heqn1. 
-    + apply le_S. apply le_n.
-    + admit. 
+    + admit.
 Qed.
 
 Theorem le_plus_l : forall a b,
