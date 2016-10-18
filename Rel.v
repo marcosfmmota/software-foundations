@@ -97,7 +97,17 @@ Proof.
 (** **** Exercise: 2 stars, optional  *)
 (** Show that the [total_relation] defined in earlier is not a partial
     function. *)
-
+Theorem total_not_partial_function :
+  ~ (partial_function total_relation).
+Proof.
+  unfold not. unfold partial_function. intros.
+  assert (0=1). {
+  apply H with (x:=0).
+  - apply total.
+  - apply total. }
+  inversion H0.
+Qed.
+    
 (* FILL IN HERE *)
 (** [] *)
 
