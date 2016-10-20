@@ -184,7 +184,7 @@ Proof.
   intros n m o Hnm Hmo.
   induction o as [| o'].
   - inversion Hmo.
-  - admit.
+  - apply le_S. apply IHo'. admit.
 Qed.
 (** [] *)
 
@@ -242,7 +242,11 @@ Definition symmetric {X: Type} (R: relation X) :=
 Theorem le_not_symmetric :
   ~ (symmetric le).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold not. unfold symmetric. intros. 
+  assert (1 <= 0). {
+     apply H. apply le_S. apply le_n. 
+  } inversion H0.
+Qed.
 (** [] *)
 
 (** A relation [R] is _antisymmetric_ if [R a b] and [R b a] together
@@ -256,7 +260,11 @@ Definition antisymmetric {X: Type} (R: relation X) :=
 Theorem le_antisymmetric :
   antisymmetric le.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold antisymmetric. intros. inversion H0.
+  + reflexivity.
+  + symmetry in H2. rewrite H2 in H. remember le_trans as T. unfold transitive in T.
+    apply T with (a:=S m) in H1. apply le_Sn_n in H1. inversion H1. apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, optional  *)
@@ -277,6 +285,17 @@ Proof.
 Definition equivalence {X:Type} (R: relation X) :=
   (reflexive R) /\ (symmetric R) /\ (transitive R).
 
+Definition eq_nat := fun (a:nat) (b:nat) => a = b.
+
+Theorem eq_nat_equivalence :
+  equivalence eq_nat.
+Proof.
+  unfold equivalence. split.
+  - unfold reflexive. intros. unfold eq_nat. reflexivity.
+  - split.
+    + unfold symmetric. unfold eq_nat. intros. symmetry. apply H.
+    + unfold transitive. unfold eq_nat. intros. rewrite H0 in H. apply H.
+Qed.    
 (* ----------------------------------------------------------------- *)
 (** *** Partial Orders and Preorders *)
 
@@ -381,7 +400,10 @@ Lemma rsc_trans :
       clos_refl_trans_1n R y z ->
       clos_refl_trans_1n R x z.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction H.
+  - apply H0. 
+  - admit.
+Qed.
 (** [] *)
 
 (** Then we use these facts to prove that the two definitions of
