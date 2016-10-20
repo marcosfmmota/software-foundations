@@ -107,16 +107,16 @@ Proof.
   - apply total. }
   inversion H0.
 Qed.
-    
-(* FILL IN HERE *)
-(** [] *)
 
 (** **** Exercise: 2 stars, optional  *)
 (** Show that the [empty_relation] that we defined earlier is a
     partial function. *)
 
-(* FILL IN HERE *)
-(** [] *)
+Theorem empty_relation_partial_function :
+  partial_function empty_relation.
+Proof.
+  unfold partial_function. intros. inversion H.
+Qed.
 
 (* ----------------------------------------------------------------- *)
 (** *** Reflexive Relations *)
@@ -170,8 +170,9 @@ Proof.
   unfold lt. unfold transitive.
   intros n m o Hnm Hmo.
   induction Hmo as [| m' Hm'o].
-    (* FILL IN HERE *) Admitted.
-(** [] *)
+    - apply le_S. apply Hnm.
+    - apply le_S. apply IHHm'o.
+Qed.
 
 (** **** Exercise: 2 stars, optional  *)
 (** Prove the same thing again by induction on [o]. *)
@@ -182,7 +183,9 @@ Proof.
   unfold lt. unfold transitive.
   intros n m o Hnm Hmo.
   induction o as [| o'].
-  (* FILL IN HERE *) Admitted.
+  - inversion Hmo.
+  - admit.
+Qed.
 (** [] *)
 
 (** The transitivity of [le], in turn, can be used to prove some facts
