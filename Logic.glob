@@ -1,4 +1,4 @@
-DIGEST 205e9a7029e0d49003c59c48b96032bb
+DIGEST c3d47a703646ffdb1f85955a749ab3b9
 FLogic
 R45:51 Tactics <> <> lib
 R939:941 Coq.Init.Logic <> :type_scope:x_'='_x not
@@ -950,43 +950,43 @@ R50783:50783 Logic <> P var
 R50788:50789 Coq.Init.Logic <> :type_scope:'~'_x not
 R50790:50790 Logic <> P var
 R50810:50812 Coq.Init.Logic <> not def
-prf 51285:51299 <> not_exists_dist
-R51347:51347 Logic <> X var
-R51397:51397 Logic <> P var
-R51399:51399 Logic <> x var
-R51363:51365 Coq.Init.Logic <> :type_scope:'~'_x not
-R51381:51381 Coq.Init.Logic <> :type_scope:'~'_x not
-R51366:51372 Coq.Init.Logic <> :type_scope:'exists'_x_'..'_x_','_x not
-R51374:51375 Coq.Init.Logic <> :type_scope:'exists'_x_'..'_x_','_x not
-R51376:51377 Coq.Init.Logic <> :type_scope:'~'_x not
-R51378:51378 Logic <> P var
-R51380:51380 Logic <> x var
-R51305:51319 Logic <> excluded_middle def
-def 52025:52030 <> peirce
+prf 51296:51310 <> not_exists_dist
+R51358:51358 Logic <> X var
+R51408:51408 Logic <> P var
+R51410:51410 Logic <> x var
+R51374:51376 Coq.Init.Logic <> :type_scope:'~'_x not
+R51392:51392 Coq.Init.Logic <> :type_scope:'~'_x not
+R51377:51383 Coq.Init.Logic <> :type_scope:'exists'_x_'..'_x_','_x not
+R51385:51386 Coq.Init.Logic <> :type_scope:'exists'_x_'..'_x_','_x not
+R51387:51388 Coq.Init.Logic <> :type_scope:'~'_x not
+R51389:51389 Logic <> P var
+R51391:51391 Logic <> x var
+R51316:51330 Logic <> excluded_middle def
+def 52036:52041 <> peirce
+R52079:52079 Logic <> P var
+R52075:52075 Logic <> P var
+R52071:52071 Logic <> Q var
 R52068:52068 Logic <> P var
-R52064:52064 Logic <> P var
-R52060:52060 Logic <> Q var
-R52057:52057 Logic <> P var
-def 52083:52109 <> double_negation_elimination
-R52138:52138 Logic <> P var
-R52131:52131 Coq.Init.Logic <> :type_scope:'~'_x not
-R52132:52132 Coq.Init.Logic <> :type_scope:'~'_x not
-R52133:52133 Logic <> P var
-def 52153:52173 <> de_morgan_not_and_not
-R52213:52214 Coq.Init.Logic <> :type_scope:x_'\/'_x not
-R52212:52212 Logic <> P var
-R52215:52215 Logic <> Q var
-R52197:52198 Coq.Init.Logic <> :type_scope:'~'_x not
-R52207:52207 Coq.Init.Logic <> :type_scope:'~'_x not
-R52201:52204 Coq.Init.Logic <> :type_scope:x_'/\'_x not
-R52199:52199 Coq.Init.Logic <> :type_scope:'~'_x not
-R52200:52200 Logic <> P var
-R52205:52205 Coq.Init.Logic <> :type_scope:'~'_x not
-R52206:52206 Logic <> Q var
-def 52232:52244 <> implies_to_or
-R52281:52282 Coq.Init.Logic <> :type_scope:x_'\/'_x not
-R52279:52279 Coq.Init.Logic <> :type_scope:'~'_x not
-R52280:52280 Logic <> P var
+def 52094:52120 <> double_negation_elimination
+R52149:52149 Logic <> P var
+R52142:52142 Coq.Init.Logic <> :type_scope:'~'_x not
+R52143:52143 Coq.Init.Logic <> :type_scope:'~'_x not
+R52144:52144 Logic <> P var
+def 52164:52184 <> de_morgan_not_and_not
+R52224:52225 Coq.Init.Logic <> :type_scope:x_'\/'_x not
+R52223:52223 Logic <> P var
+R52226:52226 Logic <> Q var
+R52208:52209 Coq.Init.Logic <> :type_scope:'~'_x not
+R52218:52218 Coq.Init.Logic <> :type_scope:'~'_x not
+R52212:52215 Coq.Init.Logic <> :type_scope:x_'/\'_x not
+R52210:52210 Coq.Init.Logic <> :type_scope:'~'_x not
+R52211:52211 Logic <> P var
+R52216:52216 Coq.Init.Logic <> :type_scope:'~'_x not
+R52217:52217 Logic <> Q var
+def 52243:52255 <> implies_to_or
+R52292:52293 Coq.Init.Logic <> :type_scope:x_'\/'_x not
+R52290:52290 Coq.Init.Logic <> :type_scope:'~'_x not
+R52291:52291 Logic <> P var
+R52294:52294 Logic <> Q var
 R52283:52283 Logic <> Q var
-R52272:52272 Logic <> Q var
-R52269:52269 Logic <> P var
+R52280:52280 Logic <> P var

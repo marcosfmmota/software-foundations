@@ -1,0 +1,6 @@
+#Remove configuration files and html
+
+*.html
+*.glob
+*.vo
+*.aux
