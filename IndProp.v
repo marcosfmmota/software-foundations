@@ -453,7 +453,10 @@ Proof.
 Theorem ev_ev__ev : forall n m,
   ev (n+m) -> ev n -> ev m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction H0.
+  - simpl in H. apply H.
+  - simpl in H. apply evSS_ev in H. apply IHev. apply H.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, optional (ev_plus_plus)  *)
@@ -464,7 +467,10 @@ Proof.
 Theorem ev_plus_plus : forall n m p,
   ev (n+m) -> ev (n+p) -> ev (m+p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. apply ev_sum.
+  - admit.
+  - admit.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -555,14 +561,6 @@ Inductive next_even : nat -> nat -> Prop :=
 Inductive total_relation : nat->nat->Prop :=
   | total : forall (n:nat) (m:nat),  total_relation n m.
 
-(*Inductive ge : nat -> nat -> Prop :=
-  | ge_n : forall n, ge n n
-  | ge_S : forall n m, (ge n m) -> (ge (S n) m). 
-*)
-
-(*Inductive nat_0: nat -> nat -> Prop :=
-  | n_true : forall n m :nat.
-*)
 (** **** Exercise: 2 stars (empty_relation)  *)
 (** Define an inductive binary relation [empty_relation] (on numbers)
     that never holds. *)
@@ -570,8 +568,6 @@ Inductive total_relation : nat->nat->Prop :=
 Inductive empty_relation: nat -> nat -> Prop :=
   .  
 
-
-(** [] *)
 
 (** **** Exercise: 3 stars, optional (le_exercises)  *)
 (** Here are a number of facts about the [<=] and [<] relations that
@@ -605,23 +601,32 @@ Qed.
 Theorem Sn_le_Sm__n_le_m : forall n m,
   S n <= S m -> n <= m.
 Proof.
-  intros. remember (S n). remember (S m). induction H.
-  - rewrite Heqn0 in Heqn1. inversion Heqn1. apply le_n.
-  - rewrite Heqn0 in H. inversion Heqn1. 
-    + admit.
+  induction m. 
+  -  intros. inversion H.
+    + apply le_n.
+    + inversion H1.
+  - intros. admit. 
 Qed.
 
 Theorem le_plus_l : forall a b,
   a <= a + b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. induction b.
+  - rewrite <- plus_n_O. apply le_n.
+  - rewrite <- plus_n_Sm. apply le_S. apply IHb.   
+Qed.
 
 Theorem plus_lt : forall n1 n2 m,
   n1 + n2 < m ->
   n1 < m /\ n2 < m.
 Proof.
  unfold lt.
- (* FILL IN HERE *) Admitted.
+ intros. split.
+ - induction m.
+   + inversion H.
+   + apply le_S. apply IHm. admit.
+  - admit.
+Qed. 
 
 Theorem lt_S : forall n m,
   n < m ->
