@@ -180,10 +180,13 @@ Print ev_4'''.
 
 Theorem ev_8 : ev 8.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  apply ev_SS. apply ev_SS. apply ev_SS. apply ev_SS. apply ev_0.
+Qed.
 
 Definition ev_8' : ev 8 :=
-  (* FILL IN HERE *) admit.
+  ev_SS 6 (ev_SS 4 (ev_SS 2 (ev_SS 0 ev_0))).
+
+Print ev_8'.
 (** [] *)
 
 (* ################################################################# *)
@@ -338,7 +341,9 @@ Definition and_comm' P Q : P /\ Q <-> Q /\ P :=
 (** Construct a proof object demonstrating the following proposition. *)
 
 Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R :=
-  (* FILL IN HERE *) admit.
+  fun (P : Prop) => fun (Q : Prop) => fun (R : Prop) =>
+  match   
+
 (** [] *)
 
 (** ** Disjunction
