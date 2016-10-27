@@ -109,6 +109,11 @@ Inductive rgb : Type :=
   | red : rgb
   | green : rgb
   | blue : rgb.
+
+(* rgb_ind : forall P : rgb -> Prop,
+  P red -> P green -> P blue ->
+  forall y : rgb, P y *)
+
 Check rgb_ind.
 (** [] *)
 
@@ -137,7 +142,10 @@ Inductive natlist1 : Type :=
   | nsnoc1 : natlist1 -> nat -> natlist1.
 
 (** Now what will the induction principle look like? *)
-(** [] *)
+(** natlist1_ind : forall P : natlist1 -> Prop,
+      P nnil1 -> (forall l : natlist1, P l -> forall n : nat, P (nsnoc1 l n)) ->
+      forall r : natlist1, P r *)
+Check natlist1_ind.
 
 (** From these examples, we can extract this general rule:
 

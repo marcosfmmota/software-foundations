@@ -101,7 +101,7 @@ Theorem total_not_partial_function :
   ~ (partial_function total_relation).
 Proof.
   unfold not. unfold partial_function. intros.
-  assert (0=1). {
+  assert (0 = 1). {
   apply H with (x:=0).
   - apply total.
   - apply total. }

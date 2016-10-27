@@ -1,4 +1,4 @@
-(** * IndProp: Inductively Defined Propositions *)
+ (** * IndProp: Inductively Defined Propositions *)
 
 Require Export Logic.
 
