@@ -603,14 +603,14 @@ Proof. simpl. reflexivity.  Qed.
     this one, define it in terms of a previously defined function. *)
 
 Definition blt_nat (n m : nat) : bool :=
-  (* FILL IN HERE *) admit.
+  (leb n m) && (negb (beq_nat n m)).
 
 Example test_blt_nat1:             (blt_nat 2 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 Example test_blt_nat2:             (blt_nat 2 4) = true.
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 Example test_blt_nat3:             (blt_nat 4 2) = false.
-(* FILL IN HERE *) Admitted.
+Proof. reflexivity. Qed.
 (** [] *)
 
 (* ################################################################# *)
@@ -785,7 +785,9 @@ Proof.
 Theorem plus_id_exercise : forall n m o : nat,
   n = m -> m = o -> n + m = m + o.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m o. intros H1 H2.
+  rewrite -> H1. rewrite -> H2. reflexivity.
+Qed.
 (** [] *)
 
 (** The [Admitted] command tells Coq that we want to skip trying
@@ -817,7 +819,8 @@ Theorem mult_S_1 : forall n m : nat,
   m = S n ->
   m * (1 + n) = m * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros m n H. simpl. rewrite -> H. reflexivity.
+Qed.
 (** [] *)
 
 
@@ -1024,14 +1027,22 @@ Qed.
 Theorem andb_true_elim2 : forall b c : bool,
   andb b c = true -> c = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros [] [].
+  - simpl. reflexivity.
+  - simpl. intros H. rewrite -> H. reflexivity.
+  - simpl. intros H. reflexivity.
+  - simpl. intros. rewrite -> H. reflexivity.
+Qed.  
 (** [] *)
 
 (** **** Exercise: 1 star (zero_nbeq_plus_1)  *)
 Theorem zero_nbeq_plus_1 : forall n : nat,
   beq_nat 0 (n + 1) = false.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  destruct n. 
+  - simpl. reflexivity.
+  - simpl. reflexivity.
+Qed. 
 (** [] *)
 
 (* ================================================================= *)
@@ -1108,7 +1119,16 @@ Fixpoint plus' (n : nat) (m : nat) : nat :=
     _does_ terminate on all inputs, but that Coq will reject because
     of this restriction. *)
 
-(* FILL IN HERE *)
+(*Fixpoint incr_to_decr (n:nat) (m:nat) :=
+  match n with
+  | O => n * m 
+  | S p => match m with
+           | O => m
+           | S t => incr_to_decr n t + incr_to_decr p m
+           end  
+  end.
+*)
+
 (** [] *)
 
 (* ################################################################# *)
@@ -1126,6 +1146,10 @@ Proof.
   intros f x b. rewrite -> x. rewrite -> x. reflexivity.
 Qed.
 
+(** Now state and prove a theorem [negation_fn_applied_twice] similar
+    to the previous one but where the second hypothesis says that the
+    function [f] has the property that [f x = negb x].*)
+
 Theorem negation_fn_applied_twice :
   forall (f: bool -> bool),
   (forall (x : bool), f x = negb x) ->
@@ -1136,11 +1160,6 @@ Proof.
   - reflexivity.
 Qed.
 
-(** Now state and prove a theorem [negation_fn_applied_twice] similar
-    to the previous one but where the second hypothesis says that the
-    function [f] has the property that [f x = negb x].*)
-
-(* FILL IN HERE *)
 (** [] *)
 
 (** **** Exercise: 2 stars (andb_eq_orb)  *)
@@ -1202,7 +1221,12 @@ Qed.
         then incrementing.
 *)
 
-(* FILL IN HERE *)
+Inductive bin : Type :=
+  | O : bin
+  | twice : bin -> bin
+  | more_t : bin -> bin.
+
+
 (** [] *)
 
 (** $Date: 2016-05-26 16:17:19 -0400 (Thu, 26 May 2016) $ *)
