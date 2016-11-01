@@ -1222,9 +1222,9 @@ Qed.
 *)
 
 Inductive bin : Type :=
-  | O : bin
-  | twice : bin -> bin
-  | more_t : bin -> bin.
+  | zero : bin
+  | one : bin
+  | carry : bin -> bin.
 
 
 (** [] *)
