@@ -341,8 +341,13 @@ Definition and_comm' P Q : P /\ Q <-> Q /\ P :=
 (** Construct a proof object demonstrating the following proposition. *)
 
 Definition conj_fact : forall P Q R, P /\ Q -> Q /\ R -> P /\ R :=
-  fun (P : Prop) => fun (Q : Prop) => fun (R : Prop) =>
-  match   
+  fun P Q R =>
+    fun (H : P /\ Q) => fun (H0: Q /\ R) =>
+      match H with
+      | conj HP HQ => match H0 with
+                      | conj _ HR => conj HP HR
+                      end
+      end.  
 
 (** [] *)
 
@@ -371,7 +376,12 @@ End Or.
     using [Print] to peek at the ones we already defined!). *)
 
 Definition or_comm : forall P Q, P \/ Q -> Q \/ P :=
-  (* FILL IN HERE *) admit.
+  fun P Q => fun (H : P \/ Q) =>
+  match H with
+  | or_introl hp => or_intror hp
+  | or_intror hq => or_introl hq
+  end.
+
 (** [] *)
 
 (** ** Existential Quantification
@@ -409,8 +419,8 @@ Definition some_nat_is_even : exists n, ev n :=
 (** **** Exercise: 2 stars, optional (ex_ev_Sn)  *)
 (** Complete the definition of the following proof object: *)
 
-Definition ex_ev_Sn : ex (fun n => ev (S n)) :=
-(* FILL IN HERE *) admit.
+Definition ex_ev_Sn : ex (fun n => ev (S n)) := 
+  ex_intro (fun n => ev (S n)) 3 (ev_SS 2 (ev_SS 0 ev_0)).
 (** [] *)
 
 (* ================================================================= *)
@@ -504,7 +514,8 @@ Notation "x = y" := (eq x y)
 Lemma leibniz_equality : forall (X : Type) (x y: X),
   x = y -> forall P:X->Prop, P x -> P y.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros. destruct H. apply H0.
+Qed.
 (** [] *)
 
 (** We can use [eq_refl] to construct evidence that, for example, [2 =
