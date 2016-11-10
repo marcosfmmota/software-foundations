@@ -167,6 +167,28 @@ Definition ev_ind_dpm:
             ps n' evn' (f n' evn')
         end.
 
+(** Encaixando o "match" acima na forma geral da explicação anterior
+
+      match E as y in (T x1 ... xn) return U with
+      | C z1 ... zm  (* : T x1' ... xn' *)  => B
+      | ...
+      end
+
+    temos:
+
+      - E: pevn.
+      - T: ev, x1: a, n: 1.
+      - U: P a.
+      - (1º Caso) C: ev_0, m: 0, x1': 0.
+      - (2º Caso) C: ev_SS, z1: n', z2: evn', m: 2, x1': S (S n').
+
+    Observe que o termo retornado em cada caso tem tipo [P x1']
+
+      - p0 : P 0
+      - ps n' evn' (f n' evn') : P (S (S n'))
+
+    o que garante a boa-tipagem do "match". *)
+
 
 (** O trecho acima do CPDT tem a seguinte continuação, também
     importante:
@@ -215,7 +237,6 @@ Definition le'_ind_po : forall P : nat -> nat -> Prop,
     | le'_S n' m' plenm => ps n' m' plenm (f n' m' plenm)
     end. 
 
-
 (** EXERCÍCIO: enuncie e prove o princípio de indução para [le],
                cuja definição é:
 
@@ -235,7 +256,7 @@ Definition le_ind_po : forall (n : nat) (P : nat -> Prop),
     | le_n => pn
     | le_S m' plenm => ps m' plenm (f m' plenm)
     end.
-    
+
 (* ================================================================ *)
 
 (** * Objetos de Prova para Igualdade *)
@@ -271,20 +292,27 @@ Definition eq_sym: forall (T : Type) (x y : T), x = y -> y = x
   fun T x y hxy
     =>
     match hxy in _ = y' return y' = x with
-    | eq_refl (* ou simplesmente: eq_refl *)
-        => @eq_refl T x
+    | eq_refl => @eq_refl T x
     end.
 
 
-(** EXERCÍCIO: Prove usando uma função recursiva: *)
+(** EXERCÍCIO: Prove usando um objeto de prova: *)
 
 Definition eq_trans_po:
-  forall (T: Type) (x y z : T), x = y -> y = z -> x = z 
-  :=
-  fun T x y z Hxy Hyz =>
-  match Hyz in _ = z' return x = z' with
-  | eq_refl => Hxy 
-  end.  
+  forall (T: Type) (x y z : T), x = y -> y = z -> x = z
+    :=
+    fun T x y z Hxy Hyz =>
+    match Hyz in _ = z' return x = z' with
+    | eq_refl => Hxy 
+    end. 
+
+
+(** EXERCÍCIO: Enuncie e prove o princípio de indução para [eq].
+
+    ATENÇÃO: Nós vimos no capítulo IndPrinciples como são obtidos os
+             enunciados dos princípios de indução para tipos
+    quaisquer. Assim sendo, é instrutivo tentar escrever a sua propria
+    versão do enunciado antes de executar [Check eq_ind]. *)
 
 
 (* ================================================================ *)
