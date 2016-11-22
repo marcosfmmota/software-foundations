@@ -158,6 +158,23 @@ Proof.
     erro, o qual é então capturado pelo "try". *)
 
 
+(** Outra possibilidade para a prova acima consiste em combinar [;]
+    com a aplicação de diferentes argumentos para cada objetivo de
+    prova restante:
+
+      expr ; [ expr1 | ... | exprn ]
+
+    Exemplo: *)
+
+Theorem plus_0_r_seq_cases: forall n, n + 0 = n.
+Proof.
+  induction n as [| n' HI]; [ | simpl; rewrite HI]; reflexivity.
+  Qed.
+
+(** Essa segunda versão tem a beleza de não tentar aplicar uma
+    hipótese indutiva que nós sabemos que não existe no caso base. *)
+
+
 (* ------------------------------------------------------ *)
 
 (** Observe que o tatical [try] só deixa o contexto inalterado em caso
@@ -196,7 +213,6 @@ expri are evaluated to vi and vi must be tactic values, for i=1,...,n.
 Supposing n>1, it applies v1 to each goal independently, if it doesn’t
 solve the goal then it tries to apply v2 and so on. It fails if there
 is no solving tactic.
-
 ----------------------------------------------------------------------
 
 Essa tática pode ser usada como abaixo: *)
@@ -248,7 +264,6 @@ Proof.
       [apply hnao in hsim; inversion hsim.]
 
     Exemplo: *)
-                         
 
 Theorem example_contradiction: forall P Q : Prop, P -> ~P -> Q.
 Proof.
@@ -264,13 +279,14 @@ Proof.
     definição para a tática [contradiction], e aplique-a para provar
     um teorema baseado em contradição. *)
 
-Ltac my_contradiction := match goal with
-                         | [H1 : ?T, H2 : ~?T |- ?C] => apply H2 in H1; inversion H1
-                         end. 
+Ltac my_contradiction := match goal with 
+                         | H1: ?T, H2: ~?T |- ?C => apply H2 in H1; inversion H1
+                          end. 
 
-Theorem example_contradiction': forall P Q : Prop, P -> ~P -> Q.
+Theorem example_my_contradiction: forall P Q : Prop, P -> ~P -> Q.
 Proof.
-  intros; my_contradiction. Qed.
+  intros; my_contradiction. 
+Qed.
 
 (** EXERCÍCIO: Usando o fato de que táticas podem ser RECURSIVAS e
                podem ter vários casos no "match goal", escreva uma
@@ -281,4 +297,737 @@ Proof.
       ...
       hn: Pn
       ________________
-      P1 /\ P2 /\ ... /\ Pn *)
+      P1 /\ P2 /\ ... /\ Pn
+
+    e utilize-a no teorema abaixo: *)
+
+Ltac conj_tactic := match goal with
+                    | H1 : ?T |- ?T => apply H1
+                    | |- ?P /\ ?Q => split; conj_tactic
+                    end.
+
+Theorem test_conj_tactic: forall P Q R S T : Prop,
+  P -> Q-> R -> S -> T -> (P /\ Q /\ R /\ S /\ T).
+Proof.
+  intros.
+  conj_tactic. (* <-- APLIQUE A SUA TÁTICA AQUI! *)
+Qed.
+
+(* ------------------------------------------------------ *)
+
+(** O uso de [apply] para resolver contextos do tipo
+
+      [...]
+      H: P
+      ________
+      P
+
+    é um caso particular para o qual há uma tática específica:
+    [exact]. *)
+
+Theorem exemplo_exact: forall P : Prop, P -> P.
+Proof.
+  intros P hp. exact hp. Qed.
+
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual010.html#sec339
+
+----------------------------------------------------------------------
+8.2.1  exact term
+
+This tactic applies to any goal. It gives directly the exact proof
+term of the goal. Let T be our goal, let p be a term of type U then
+exact p succeeds iff T and U are convertible (see Section 4.3).
+
+Error messages:
+
+    Not an exact proof
+----------------------------------------------------------------------
+
+Observe que essa tática pode ser usada como uma versão de [refine]
+que só aceita um objeto de prova completo: *)
+
+Theorem exemplo_exact_po: forall P : Prop, P -> P.
+Proof.
+  exact ( fun P hp => hp ). Qed.
+
+
+(* ------------------------------------------------------ *)
+
+(* Nós podemos imprimir mensagens durante a execução de táticas usando
+   a tática [idtac]: *)
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual011.html#hevea_default788
+
+----------------------------------------------------------------------
+Identity
+
+The constant idtac is the identity tactic: it leaves any goal
+unchanged but it appears in the proof script.
+
+Variant: idtac message_token ... message_token
+
+       [ message_token ::= string  |  ident  |  integer ]
+
+This prints the given tokens. Strings and integers are printed
+literally. If a (term) variable is given, its contents are printed.
+----------------------------------------------------------------------
+
+*)
+
+Ltac my_conj_tactic_print
+  :=
+  match goal with
+  | |- ?L /\ ?R => idtac "Dividindo" L "e" R;
+                   split;
+                   my_conj_tactic_print
+  | H: ?G |- ?G => idtac "Provando" G;
+                   exact H
+  end.
+
+Theorem using_idtac: forall P Q R S T : Prop,
+  P -> Q-> R -> S -> T -> (P /\ Q /\ R /\ S /\ T).
+Proof.
+  intros; my_conj_tactic_print. (* <-- Veja o que é impresso aqui! *)
+  Qed.
+
+
+(** A tática [idtac] também pode ser usada sem mensagem alguma.
+    Com ou sem mensagem, ela deixa o estado da prova inalterado,
+    "repassando" o objetivo de prova à frente, para que seja provado
+    posteriormente.
+
+    Esse comportamento é utilizado na variação a seguir da tática
+    acima, que quebra as conjunções mas passa à frente os objetivos
+    de prova que não forem hipóteses: *)
+
+Ltac my_conj_tactic_dont_fail
+  :=
+  match goal with
+  | |- ?L /\ ?R => idtac "Dividindo" L "e" R;
+                   split;
+                   my_conj_tactic_dont_fail
+  | H: ?G |- ?G => idtac "Provando" G;
+                   exact H
+  | |- ?G => idtac "Repassando" G
+  end.
+
+Theorem forwarding_with_idtac: forall P Q R S T : Prop,
+  P -> Q-> R -> S -> T -> (P /\ Q /\ R /\ S /\ T /\ 0 = 0).
+Proof.
+  intros.
+  my_conj_tactic_dont_fail. (* A versão anterior falha aqui! *)
+  reflexivity.
+  Qed.
+
+
+(* ------------------------------------------------------ *)
+
+(** EXERCÍCIO: Escreva uma tática que resolva provas da forma
+
+      H: Q
+      ___________________________
+      P1 \/ P2 \/ ... Q \/ ... Pn
+
+    para n >= 0. A tática não deve funcionar se a prova não tiver o
+    formato acima.
+
+    Depois, utilize a tática para provar os teoremas a seguir: *)
+
+Ltac or_tac := match goal with 
+               | H : ?G |- ?G => exact H
+               | |- ?P \/ ?Q => try (left; or_tac); right; or_tac
+               end.
+
+Theorem test_or_tac_1: forall P1 P2 P3 Q : Prop,
+  Q -> (P1 \/ (0 = 0) \/ Q \/ P2 \/ P3).
+Proof.
+  intros.
+  or_tac.  (* Use a tática aqui! *)
+Qed.
+
+Theorem test_or_tac_2: forall P1 P2 P3 Q : Prop,
+  Q -> ((0 = 0) \/ P1 \/ P2 \/ P3 \/ Q).
+Proof.
+  intros.
+  or_tac.  (* Use a tática aqui! *)
+Qed.
+
+(** Observe o que acontece se tentarmos utilizar a tática acima num
+    contexto onde ela não funciona: *)
+
+Theorem or_tac_doesnt_work: forall P1 P2 P3 Q : Prop,
+  Q -> ((0 = 0) \/ P1 \/ P2 \/ P3).
+Proof.
+  intros.
+  (* <------------  Use a tática aqui! *)
+  Abort.
+
+
+(** Em casos como esse acima, onde não há casos aplicáveis da tática,
+    o Coq emite uma mensagem dizendo que esse é o caso.
+
+    Para um usuário da tática, porém, a mensagem emitida pelo Coq
+    pode não fazer sentido, e nesse caso seria melhor que a tática
+    falhasse emitindo um aviso específico. Isso pode ser feito por
+    meio da tática [fail]: *)
+
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual011.html#hevea_tactic213
+
+----------------------------------------------------------------------
+Failing
+
+The tactic fail is the always-failing tactic: it does not solve any
+goal. It is useful for defining other tacticals since it can be caught
+by try, repeat, match goal, or the branching tacticals. The fail
+tactic will, however, succeed if all the goals have already been
+solved.
+
+Variants:
+
+  1. fail n
+
+     The number n is the failure level. If no level is specified, it
+     defaults to 0. The level is used by try, repeat, match goal and
+     the branching tacticals. If 0, it makes match goal considering
+     the next clause (backtracking). If non zero, the current match
+     goal block, try, repeat, or branching command is aborted and the
+     level is decremented. In the case of +, a non-zero level skips
+     the first backtrack point, even if the call to fail n is not
+     enclosed in a + command, respecting the algebraic identity.
+
+  2. fail message_token ... message_token
+
+     The given tokens are used for printing the failure message.
+
+  3. fail n message_token … message_token
+
+     This is a combination of the previous variants.
+----------------------------------------------------------------------
+
+*)
+
+Ltac or_tac_print
+  :=
+  match goal with
+  | |- ?L \/ ?R  => try (left; or_tac_print); right; or_tac_print
+  | H: ?G |- ?G  => exact H
+  | |- ?G => fail 1 "Essa tática não resolve" G "neste contexto"
+  end.
+
+(** IMPORTANTE:
+
+    Observe, na tática acima, o uso da 3ª forma de [fail]: o argumento
+    [1] garante que o [match] vai falhar imediatamente. Se tivéssemos
+    omitido o argumento numérico ou fornecido [0], o [match] iria
+    procurar uma próxima cláusula para casar o objetivo de prova, e,
+    como não há, o erro "No matching clauses for match goal" ocorreria
+    novamente. *)
+
+Theorem test_or_tac_print: forall P1 P2 P3 P4 Q : Prop,
+  Q -> ((0 = 0) \/ P1 \/ P2 \/ P3).
+Proof.
+  intros.
+  (*or_tac_print*) (* DESCOMENTE PARA VER A MENSAGEM DE ERRO. *)
+  left; reflexivity.
+  Qed.
+
+
+(* ------------------------------------------------------ *)
+
+(** Uma tática para resolver objetivos da forma
+
+      P -> P
+
+    poderia ser escrita assim: *)
+
+Ltac one_imp
+  :=
+  match goal with
+  | |- ?P -> ?P  => intros H; exact H
+  end.
+
+Theorem test_one_imp: forall P : Prop, P -> P.
+Proof.
+  intro P. one_imp. Qed.
+
+
+(** EXERCÍCIO: na prova acima, troque temporariamente o identificador
+               [P] por [H], e veja o que acontece com a prova. *)
+
+
+(** O exercício acima evidencia uma falha na tática [one_imp]: ela
+    utiliza um identificador fixo ao introduzir a hipótese, o que leva
+    a um conflito de nomes em contextos nos quais esse identificador
+    já está sendo utilizado. Isso pode ser resolvido usando [fresh] e
+    [let]: *)
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual011.html#hevea_default826
+
+----------------------------------------------------------------------
+Generating fresh hypothesis names
+
+Tactics sometimes have to generate new names for hypothesis. Letting
+the system decide a name with the intro tactic is not so good since it
+is very awkward to retrieve the name the system gave. The following
+expression returns an identifier:
+
+    fresh component ... component
+
+It evaluates to an identifier unbound in the goal. This fresh
+identifier is obtained by concatenating the value of the component’s
+(each of them is, either an qualid which has to refer to a
+(unqualified) name, or directly a name denoted by a string). If the
+resulting name is already used, it is padded with a number so that it
+becomes fresh. If no component is given, the name is a fresh
+derivative of the name H.
+----------------------------------------------------------------------
+
+*)
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual011.html#hevea_default800
+
+----------------------------------------------------------------------
+Local definitions
+
+Local definitions can be done as follows:
+
+    let ident1 := expr1
+    with ident2 := expr2
+    ...
+    with identn := exprn in
+    expr 
+
+each expri is evaluated to vi, then, expr is evaluated by substituting
+vi to each occurrence of identi, for i=1,...,n. There is no
+dependencies between the expri and the identi.
+
+Local definitions can be recursive by using let rec instead of let. In
+this latter case, the definitions are evaluated lazily so that the rec
+keyword can be used also in non recursive cases so as to avoid the
+eager evaluation of local definitions.
+----------------------------------------------------------------------
+
+*)
+
+Ltac one_imp_fresh
+  :=
+  match goal with
+  | |- ?P -> ?P  => let H := fresh in
+                    idtac "Utilizando o identificador" H;
+                    intros H; exact H
+  | |- ?G  => fail 1 G "não tem a forma P -> P"
+  end.
+
+Theorem test_one_imp_fresh: forall P : Prop, P -> P.
+Proof.
+  intro H. one_imp_fresh. Qed.
+
+Theorem test_one_imp_fresh_fail: forall P : Prop, False -> P.
+Proof.
+  intro P.
+  (* one_imp_fresh. *) (* <-- DESCOMENTE PARA TESTAR. *)
+  intro; contradiction.
+  Qed.
+
+
+(** EXERCÍCIO: Escreva uma tática RECURSIVA que resolva objetivos da
+               forma
+
+      P1 -> P2 -> P3 -> ... -> Pn -> Q
+
+    caso Q seja P1, ou P2, ..., ou Pn, e que, em caso contrário, deixe
+    P1 ... Pn como hipóteses e Q para ser provada pelo usuário.
+    Em seguida, aplique-a ao teorema a seguir.
+
+    Observação: naturalmente, a tarefa acima poderia ser feita
+    facilmente via
+
+      [ intros; try(assumption). ]
+
+    mas o enunciado pede uma tática recursiva, induzindo ao uso de
+    [fresh] e [let].*)
+
+
+Ltac impl_scratch :=
+  match goal with
+  | |- ?P -> ?Q => let H:= fresh in intros H; impl_scratch; try(exact H)
+  | |- ?G => idtac
+  end.
+
+
+Theorem test_impl_scratch: forall P Q R S T : Prop,
+  P -> Q-> R -> S -> T -> S.
+Proof.
+  intros until T.
+  impl_scratch.  (* <-- APLIQUE A SUA TÁTICA AQUI! *)
+Qed.
+
+(* ------------------------------------------------------ *)
+
+(* O tipo de um termo pode ser obtido com [type of], o que é útil
+   para usar em combinação com [fresh]: *)
+
+Ltac impl_print
+  :=
+  match goal with
+  | |- ?A -> ?C => let nome := fresh in
+                   intro nome;
+                   let termo := type of nome in
+                   idtac "Introduzindo" termo "como" nome;
+                   impl_print;
+                   idtac "Tentando ' exact" nome "'";
+                   try (exact nome);
+                   idtac "' exact" nome "' não funcionou"
+
+  | |- _ => idtac
+  end.
+
+
+Theorem test_impl_print: forall P Q R S T : Prop,
+  P -> Q-> R -> S -> T -> Q.
+Proof.
+  intros until T.
+  impl_print.  (* <-- VEJA O QUE É IMPRESSO AQUI! *)
+  Qed.
+
+
+(* ------------------------------------------------------ *)
+
+(** As cláusulas do casamento de padrão da Ltac podem procurar por
+    termos com uma forma particular, via [context]: *)
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual011.html#hevea_default809
+
+----------------------------------------------------------------------
+There is a special form of patterns to match a subterm against the
+pattern:
+
+    context ident [ cpattern ] 
+
+It matches any term with a subterm matching cpattern. If there is a
+match, the optional ident is assigned the “matched context”, i.e. the
+initial term where the matched subterm is replaced by a hole. The
+example below will show how to use such term contexts.
+
+If the evaluation of the right-hand-side of a valid match fails, the
+next matching subterm is tried. If no further subterm matches, the
+next clause is tried. Matching subterms are considered top-bottom and
+from left to right (with respect to the raw printing obtained by
+setting option Printing All, see Section 2.9).
+----------------------------------------------------------------------
+
+*)
+
+
+Ltac cancel_negb_negb
+  :=
+  repeat          (* <-- Faz todas as substituições possíveis. *)
+  match goal with
+  | |- context [ negb (negb ?t) ] 
+         =>
+         idtac "Substituindo negb (negb t) por t, com t =" t;
+         rewrite (negb_involutive t)
+  end.
+
+Theorem testando_cancelamento:
+  forall b : bool, negb (negb ( negb (negb b) )) = b.
+Proof.
+  intros. cancel_negb_negb. reflexivity. Qed.
+
+
+(** EXERCÍCIO: observe, na tática acima, a utilização de [repeat] para
+               realizar todas as substituições possíveis. O mesmo
+    poderia ter sido feito por meio de uma chamada recursiva ao final
+    da cláusula do [match]. Nesse caso, porém, como a recursividade
+    iria acabar?
+
+    Resolva essa questão e aplique a tática resultante abaixo: *)
+
+Theorem testando_versao_recursiva:
+  forall b : bool, negb (negb ( negb (negb b) )) = b.
+Proof.
+  intros.
+  Admitted.  (* UTILIZE A SUA TÁTICA AQUI! *)
+
+
+(* É possível casar várias variáveis numa mesma cláusula [context]: *)
+
+Ltac cancel_negb_negb_in_arg
+  :=
+  repeat
+  match goal with
+  | |- context [ ?F( negb (negb ?t) ) ] 
+         =>
+         idtac "Substituindo F (negb (negb t)) por F t,"
+               "com F =" F "e t =" t;
+         let H := fresh in
+         assert (H: F( negb (negb t) ) = F t)
+           by ( apply f_equal with (f := F);
+                rewrite (negb_involutive t);
+                reflexivity
+              );
+         rewrite H
+  end.
+
+Theorem testando_casamento_duplo:
+  forall b : bool, negb (negb ( negb (negb b) )) = b.
+Proof.
+  intros.
+  cancel_negb_negb_in_arg. (* <-- VEJA O QUE É IMPRESSO AQUI. *)
+  cancel_negb_negb. reflexivity.
+  Qed.
+
+
+(** EXERCÍCIO: A tática acima evidentemente não é eficiente, pois,
+               para cada casamento de "F" e "t", produz uma prova
+    de que "F( negb (negb t) ) = F t".
+
+    Assim sendo, prove num teorema que
+
+      F( negb (negb t) ) = F t
+
+    é sempre verdade, e então escreva uma variação da tática acima que
+    use [rewrite] diretamente, sem a necessidade de um [assert].
+
+    Em seguida, use a sua tática abaixo: *)
+
+Theorem testando_teorema_na_tatica:
+  forall b : bool, negb (negb ( negb (negb b) )) = b.
+Proof.
+  intros.
+  (* ... *) (* <--------- USE A SUA TÁTICA AQUI! *)
+  (* cancel_negb_negb. reflexivity. *)
+  Admitted.
+
+
+(** Casamentos em trechos separados podem ser feitos por meio de
+    [match]es aninhados: *)
+
+Ltac neg_and_S_into_var
+  :=
+  match goal with
+  | |- context [ negb ?B ]
+         =>
+         match goal with
+         | |- context [ S ?n ]
+                =>
+                let bname := fresh "b" in
+                let nname := fresh "n" in
+                remember (negb B) as bname;
+                remember (S n) as nname
+         end
+  end.
+
+Theorem testando_casamento_aninhado:
+  forall b : bool, forall m : nat,
+  orb (negb b) (negb (negb b)) = true
+  /\
+  S m = m + 1.
+Proof.
+  intros.
+  neg_and_S_into_var.  (* <-- OBSERVE OS TERMOS INTRODUZIDOS! *)
+  split.
+  - destruct b0; reflexivity.
+  - subst n. rewrite <- plus_n_Sm. apply f_equal. apply plus_n_O.
+  Qed.
+
+
+(* ------------------------------------------------------ *)
+
+(** É importante entender esta característica crucial do [match] da
+    Ltac: cada cláusula do [match] pode ser executada várias vezes,
+    _cada uma casando com diferentes combinações de termos_,
+    até que alguma combinação não falhe, ou então até todas falharem
+    (caso em que a execução do [match] passa à próxima cláusula). *)
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual011.html#sec471
+
+----------------------------------------------------------------------
+Pattern matching on goals
+
+We can make pattern matching on goals using the following expression:
+
+    match goal with
+    | hyp1,1,...,hyp1,m1  |- cpattern1=> expr1
+    | hyp2,1,...,hyp2,m2  |- cpattern2=> expr2
+    ...
+    | hypn,1,...,hypn,mn  |- cpatternn=> exprn
+    |_    => exprn+1
+    end
+
+If each hypothesis pattern hyp1,i, with i=1,...,m1 is matched
+(non-linear first-order unification) by an hypothesis of the goal and
+if cpattern1 is matched by the conclusion of the goal, then expr1 is
+evaluated to v1 by substituting the pattern matching to the
+metavariables and the real hypothesis names bound to the possible
+hypothesis names occurring in the hypothesis patterns. If v1 is a
+tactic value, then it is applied to the goal. If this application
+fails, then another combination of hypotheses is tried with the same
+proof context pattern. If there is no other combination of hypotheses
+then the second proof context pattern is tried and so on. If the next
+to last proof context pattern fails then exprn+1 is evaluated to vn+1
+and vn+1 is applied. Note also that matching against subterms (using
+the context ident [ cpattern ]) is available and is also subject to
+yielding several matchings.
+
+Failures in subsequent tactics do not cause backtracking to select new
+branches or combinations of hypotheses, or inside the right-hand side
+of the selected branch even if it has backtracking points.
+
+Error message: No matching clauses for match goal
+
+  No clause succeeds, i.e. all matching patterns, if any, fail at the
+  application of the right-hand-side.
+
+It is important to know that each hypothesis of the goal can be
+matched by at most one hypothesis pattern. The order of matching is
+the following: hypothesis patterns are examined from the right to the
+left (i.e. hypi,mi before hypi,1). For each hypothesis pattern, the
+goal hypothesis are matched in order (fresher hypothesis first), but
+it possible to reverse this order (older first) with the match reverse
+goal with variant.
+----------------------------------------------------------------------
+
+*)
+
+(** Esse comportamento do [match] da Ltac é bem ilustrado pela
+    seguinte variação (menos direta) da tática [assumption]: *)
+
+Ltac try_all_hips
+  :=
+  match goal with
+  | H: _ |- _ => let termo := type of H in
+                 idtac "Tentando" termo;
+                 exact H  (* Vai tentar cada hipótese. *)
+  end.
+
+Theorem test_try_all_hip: forall P Q R S T : Prop,
+  P -> Q-> R -> S -> T -> Q.
+Proof.
+  intros. try_all_hips. (* <-- VEJA O QUE É IMPRESSO AQUI! *)
+  Qed.
+
+(* ------------------------------------------------------ *)
+
+(** Outro recurso útil nas táticas do Coq são as variáveis
+    existenciais. *)
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual010.html#sec342
+
+----------------------------------------------------------------------
+eapply term
+
+The tactic eapply behaves like apply but it does not fail when no
+instantiations are deducible for some variables in the premises.
+Rather, it turns these variables into existential variables which are
+variables still to instantiate (see Section 2.11). The instantiation
+is intended to be found later in the proof.
+----------------------------------------------------------------------
+
+*)
+
+
+Theorem teste_eapply: forall x y z : nat, x = S y -> S y = z -> x = z.
+Proof.
+  intros x y z xy yz.
+  eapply eq_trans.
+  - exact xy.
+  - (* Observe que aqui a variável existencial já foi substituída. *)
+    exact yz.
+  Qed.
+
+
+(** Outras táticas existem na versão "existencial", como [assumption],
+    que corresponde a [eassumption]. *)
+
+Theorem teste_essumption: forall x y z : nat, x = S y -> S y = z -> x = z.
+Proof.
+  intros x y z xy yz.
+  eapply eq_trans; eassumption. Qed.
+
+
+(* ------------------------------------------------------ *)
+
+(** O Coq possui alguns procedimentos de decisão embutidos em táticas,
+    como por exemplo as táticas [tauto] e [omega]. *)
+
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual010.html#sec407
+
+----------------------------------------------------------------------
+tauto
+
+This tactic implements a decision procedure for intuitionistic
+propositional calculus based on the contraction-free sequent calculi
+LJT* of Roy Dyckhoff [56]. Note that tauto succeeds on any instance of
+an intuitionistic tautological proposition. tauto unfolds negations
+and logical equivalence but does not unfold any other definition.
+----------------------------------------------------------------------
+
+*)
+
+Theorem teste_tauto: 
+  forall (x:nat) (P:nat -> Prop), x = 0 \/ P x -> x <> 0 -> P x.
+Proof.
+  tauto. Qed.
+
+
+(** De
+
+https://coq.inria.fr/distrib/current/refman/Reference-Manual010.html#sec435
+
+----------------------------------------------------------------------
+8.16.2  omega
+
+The tactic omega, due to Pierre Crégut, is an automatic decision
+procedure for Presburger arithmetic. It solves quantifier-free
+formulas built with ~, \/, /\, -> on top of equalities, inequalities
+and disequalities on both the type nat of natural numbers and Z of
+binary integers. This tactic must be loaded by the command Require
+Import Omega. See the additional documentation about omega (see
+Chapter 21).
+----------------------------------------------------------------------
+
+*)
+
+Require Import Omega.
+
+Theorem teste_omega: forall m n : nat, 1 + 2 * m <> 2 * n.
+Proof.
+  intros. omega. Qed.
+
+
+(** EXERCÍCIO: Nós já escrevemos táticas para resolver conjunções
+               triviais, disjunções triviais, implicações triviais,
+    etc. Tais raciocínios estão presentes numa tática como [tauto].
+
+    Com base nisso, escreva uma tática [my_tauto], embutindo nela as
+    formas diretas de se provar conjunções, disjunções e implicações.
+    Teste a sua tática em alguns exemplos.
+
+    Em seguida, melhore a sua tática, levando em consideração que os
+    conectivos acima também podem estar nas hipóteses, caso em que
+    pode ser necessário quebrá-las, etc.
+
+    Por fim, aumente a sua tática de forma a tratar negações, tanto
+    no objetivo quanto nas hipóteses. *)

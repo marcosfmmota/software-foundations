@@ -248,8 +248,7 @@ Definition le'_ind_po : forall P : nat -> nat -> Prop,
 
 Definition le_ind_po : forall (n : nat) (P : nat -> Prop),
   P n -> (forall m : nat, n <= m -> P m -> P (S m)) ->
-  forall m : nat, n <= m -> P m 
-  :=
+  forall m : nat, n <= m -> P m :=
   fun n P pn ps =>
     fix f m ple : P m :=
     match ple in le _ b return P b with
@@ -314,8 +313,12 @@ Definition eq_trans_po:
     quaisquer. Assim sendo, é instrutivo tentar escrever a sua propria
     versão do enunciado antes de executar [Check eq_ind]. *)
 
+Check eq_ind.
 
-(* ================================================================ *)
+Definition eq_ind_po : forall (A : Type) (x : A) (P : A -> Prop), P x -> forall y : A, x=y -> P y :=
+ fun T x P Hx y Hxy => match Hxy in _ = y' return P y' with
+                       | eq_refl => Hx
+                       end.
 
 (** * Objetos de Prova para Contradição *)
 
@@ -332,9 +335,44 @@ Definition eq_trans_po:
     --, enquanto P(0) pode ser qualquer coisa trivial de demonstrar,
     como [True]!
 
-    Essa estratégia é ilustrada a seguir.
-*)
+    Essa estratégia é ilustrada a seguir. *)
 
-(* ... *)
+Definition P_abs (n : nat) : Prop :=
+  match n with
+  | O => True
+  | _ => False
+  end.
+
+Definition contradiction_explodes: 0 = 1 -> forall Q : Prop, Q
+  :=
+  fun eq01 Q
+    =>
+    False_ind Q
+      match eq01 in _ = a return P_abs a with
+      | eq_refl => I
+      end.
+
+
+(** Observe que o uso de False_ind não é obrigatório: *)
+
+Definition abs_explodes: 0 = 1 -> forall Q : Prop, Q
+  :=
+  fun eq01 Q
+    =>
+    let P := fun n : nat => match n with
+                            | O => True
+                            | _ => Q
+                            end
+    in
+      match eq01 in _ = a return P a with
+      | eq_refl => I
+      end.
+
+(** E nós também podemos prová-lo: *)
+
+Definition my_False_ind: forall P : Prop, False -> P
+  :=
+  fun P abs => match abs with
+               end.
 
 (* ================================================================ *)

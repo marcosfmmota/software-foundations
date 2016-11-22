@@ -50,8 +50,6 @@ Recapitule primeiramente que
 Por exemplo:
 *)
 
-Check (eq_refl : 2 + 3 = 5).
-
 
 (**
 Agora, recapitule o argumento deste teorema:  [forall n, n + 0 = n].
@@ -60,6 +58,8 @@ Agora, recapitule o argumento deste teorema:  [forall n, n + 0 = n].
 
 Isso pode ser formalizado diretamente por uma função recursiva:
 *)
+
+Check f_equal.
 
 Definition plus_0_r_po: forall n, n + 0 = n
   :=
@@ -143,22 +143,40 @@ Definition listbool_ind_po :
     princípio de indução para um tipo polimórfico, mas a ideia não
     muda.) *)
 
-Check list_ind.
 
-(*Definition list_ind_po : forall (X : Type) (P : list X -> Prop),
+Definition list_ind_po : forall (X : Type) (P : list X -> Prop),
        P [] ->
        (forall (x : X) (l : list X), P l -> P (x :: l)) ->
        forall l : list X, P l :=
-  fun P X pn pc =>
+  fun X P pn pc =>
     fix f l : P l :=
     match l with
-    | bnil => pn
-    | bcons b l' => pc b l' (f l')
+    | nil => pn
+    | cons x l' => pc _ _ (f l')
     end.  
-*)
+
+Print list.
 (** EXERCÍCIO: Defina um tipo polimórfico para árvores binárias, e
     prove o princípio de indução correspondente. *)
 
+Inductive btree (X : Type) : Type :=
+  | bempty : btree X
+  | bleaf : X -> btree X
+  | nbranch : X -> btree X -> btree X -> btree X.
+
+
+Definition btree_ind_po : forall (X : Type) (P : btree X -> Prop),
+  P (bempty X) -> (forall (x : X) , P (bleaf X x)) ->
+  (forall (x : X) (l : btree X) (r : btree X), P l -> P r -> P (nbranch X x l r)) ->
+  forall b : btree X, P b 
+  :=
+  fun X P pe pl pb =>
+    fix f bt : P bt :=
+    match bt with
+    | bempty => pe
+    | bleaf x => pl x
+    | nbranch x l' r' => pb x l' r' (f l') (f r') 
+    end.
 
 (** EXERCÍCIO: Escreva um princípio de indução para [nat] cujo passo
     "vá de 2 em 2", ou seja, de P(n) provamos P(S(S n)).
@@ -218,19 +236,25 @@ Definition ev_ind_po:
 (* Inductive and (A B : Prop) : Prop :=  conj : A -> B -> A /\ B . *)
 Check and_ind.
 
-Definition ev_adn_po: forall A B P : Prop, (A -> B -> P) -> A /\ B -> P.
-refine(
-  fun A B =>
-).
+Definition and_ind_po: forall A B P : Prop, (A -> B -> P) -> A /\ B -> P :=
+  fun A B P  (HABP : A -> B -> P) (H : A /\ B)
+  => match H with
+     | conj HA HB =>  HABP HA HB
+     end.  
 
 (** EXERCÍCIO: Enuncie e prove o princípio de indução para [False]. *)
 
 (*  Inductive False : Prop := .  *)
 
+Definition False_ind_po : forall P : Prop, False -> P :=
+  fun P f => match f with
+             end.
 
 (** EXERCÍCIO: Enuncie e prove o princípio de indução para [True]. *)
 
 (*  Inductive True : Prop :=  I : True .  *)
 
+Definition True_ind_po : forall P : Prop, P -> True -> P :=
+  fun P (HP : P) (HT : True) => HP.
 
 (* ================================================================ *)
